@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PfandGo - Payout Voucher</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f4f9; color: #333; text-align: center; padding: 20px; margin: 0; }
+        .card { background: white; max-width: 400px; margin: 40px auto; padding: 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2e7d32; margin-bottom: 5px; font-size: 24px; }
+        .amount { font-size: 48px; font-weight: bold; color: #1b5e20; margin: 20px 0; }
+        .details { font-size: 16px; color: #666; margin-bottom: 25px; }
+        .badge { background: #e8f5e9; color: #2e7d32; padding: 8px 16px; border-radius: 20px; font-weight: 600; display: inline-block; margin-bottom: 20px; }
+        .btn { background: #2e7d32; color: white; border: none; padding: 14px 24px; font-size: 16px; font-weight: 600; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 15px; }
+        .btn:disabled { background: #9e9e9e; cursor: not-allowed; }
+        .footer { font-size: 12px; color: #999; margin-top: 25px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>PfandGo Campus Deposit</h1>
+        <div class="badge" id="status-badge">Session Voucher Verified</div>
+        <div class="details">Total Bottles Returned: <b id="items-count">0</b></div>
+        <div class="amount"><span id="total-amount">0.00</span>€</div>
+        <p id="instructions">Show this screen at the campus cashier or redemption kiosk to collect your cash or store credit.</p>
+        <button class="btn" id="redeem-btn" onclick="redeemVoucher()">Mark as Redeemed (Cashier)</button>
+        <div class="footer">Voucher ID: <span id="voucher-id">DEMO</span> &bull; PfandGo TUHH</div>
+    </div>
+
+    <script>
+        // 1. Parse URL parameters from the QR code
+        const params = new URLSearchParams(window.location.search);
+        const items = params.get("items") || "0";
+        const total = params.get("total") || "0.00";
+        const voucherId = params.get("id") || "LOCAL-TEST";
+
+        // 2. Inject values into the page
+        document.getElementById("items-count").textContent = items;
+        document.getElementById("total-amount").textContent = total;
+        document.getElementById("voucher-id").textContent = voucherId;
+
+        // 3. Check if this voucher ID was already redeemed on this device
+        const storageKey = "pfandgo_redeemed_" + voucherId;
+        if (localStorage.getItem(storageKey)) {
+            setRedeemedUI();
+        }
+
+        function redeemVoucher() {
+            localStorage.setItem(storageKey, "true");
+            setRedeemedUI();
+        }
+
+        function setRedeemedUI() {
+            const badge = document.getElementById("status-badge");
+            badge.textContent = "Voucher Redeemed";
+            badge.style.background = "#ffebee";
+            badge.style.color = "#c62828";
+
+            const btn = document.getElementById("redeem-btn");
+            btn.textContent = "Already Cashed Out";
+            btn.disabled = true;
+
+            document.getElementById("instructions").textContent = "This deposit voucher has been redeemed and is no longer valid.";
+        }
+    </script>
+</body>
+</html>
